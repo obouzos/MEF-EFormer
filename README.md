@@ -1,2 +1,1 @@
-# MEF-EFormer
-Efficient Transformer for Multi-Exposure Image Fusion
+# MEF-EFormer: Efficient Transformer for Multi-Exposure Image Fusion
