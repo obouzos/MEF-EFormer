@@ -23,10 +23,7 @@ pip install -r requirements.txt
 
 ## Inference
 
-The inference script expects two well-aligned multi-exposure RGB images:
-
-- an underexposed image
-- an overexposed image
+The inference script expects two well-aligned multi-exposure RGB images.
 
 Run the included example:
 
