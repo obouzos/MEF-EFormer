@@ -1,0 +1,19 @@
+# Operating-system files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter
+.i*ynb_checkpoints/
+
+# Virtual enviro*ments
+.venv/
+venv/
+env/
+
+# Editors*.vscode/
+.idea/
