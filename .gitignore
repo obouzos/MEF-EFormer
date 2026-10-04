@@ -8,13 +8,14 @@ __pycache__/
 *.egg-info/
 
 # Jupyter
-.i*ynb_checkpoints/
+.ipynb_checkpoints/
 
-# Virtual enviro*ments
+# Virtual environments
 .venv/
 venv/
 env/
 
-# Editors*.vscode/
+# Editors
+.vscode/
 .idea/
 .vscode/settings.json
