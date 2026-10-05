@@ -19,12 +19,7 @@ def load_image(path: Path) -> torch.Tensor:
 
     return image_tensor.unsqueeze(0)
 
-def save_image(
-    tensor: torch.Tensor,
-    path: Path,
-) -> None:
-
-    # image_tensor = tensor.detach().cpu().clamp(0.0, 1.0)
+def save_image(tensor: torch.Tensor,path: Path,) -> None:
     image_tensor = tensor.detach().cpu()
 
     if image_tensor.ndim == 4:
@@ -41,26 +36,11 @@ def save_image(
         output_image.save(output_file,format="PNG")
 
 
-def load_model(
-    weights_path: Path,
-    device: torch.device,
-) -> MEF_EFormer:
-    """
-    Construct MEF-EFormer and load the weights-only checkpoint.
-    """
+def load_model(weights_path: Path,device: torch.device) -> MEF_EFormer:
+    weights = torch.load(weights_path,map_location="cpu",weights_only=True)
 
-    weights = torch.load(
-        weights_path,
-        map_location="cpu",
-        weights_only=True,
-    )
-
-    model = MEF_EFormer()
-
-    result = model.load_state_dict(
-        weights,
-        strict=True,
-    )
+    model = MEF_EFormer() 
+    model.load_state_dict(weights,strict=True)
 
     model = model.to(device)
     model.eval()
