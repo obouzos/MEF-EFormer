@@ -2,7 +2,7 @@
 
 Official PyTorch implementation of **MEF-EFormer**, an efficient transformer architecture for multi-exposure image fusion.
 
-This repository includes the model implementation, inference script, and trained weights for MEF-EFormer.
+This repository includes the model implementation, training and inference scripts, loss function, dataloader, and trained weights for MEF-EFormer.
 
 > **Paper:** The paper link will be added when available.
 
@@ -67,7 +67,67 @@ The script automatically uses CUDA when available and otherwise runs on the CPU.
 
 ## Training
 
-The training code and instructions will be added in a future update.
+Training uses FP16 automatic mixed precision on a CUDA-capable GPU. Model parameters and saved checkpoints remain in FP32.
+
+The expected training dataset structure is:
+
+```text
+train/
+├── under/
+│   ├── input_1.png
+│   └── ...
+├── over/
+│   ├── input_1.png
+│   └── ...
+└── targets/
+    ├── input_1.png
+    └── ...
+```
+
+The images in `under`, `over`, and `targets` must use matching filenames.
+
+Run training with:
+
+```bash
+python train.py --inputs "path/to/train" --targets "path/to/train/targets"
+```
+
+By default, training uses:
+
+```text
+Epochs:                 100
+Micro-batch size:       1
+Gradient accumulation:  8 steps
+Effective batch size:   8
+Optimizer:              Adam
+Adam betas:             (0.9, 0.999)
+Initial learning rate:  5e-4
+Minimum learning rate:  1e-5
+Scheduler:              CosineAnnealingLR
+Scheduler T_max:        100
+Seed:                   1234
+Precision:              FP16 automatic mixed precision
+```
+
+The final checkpoint is saved to:
+
+```text
+checkpoints/MEF_EFormer.pth
+```
+
+No validation, early stopping, or validation-based checkpoint selection is performed during training. The final-epoch checkpoint is used for post-training evaluation.
+
+To change the number of epochs or checkpoint directory:
+
+```bash
+python train.py --inputs "path/to/train" --targets "path/to/train/targets" --epochs 100 --output-dir "checkpoints"
+```
+
+Display all available training options:
+
+```bash
+python train.py --help
+```
 
 ## Citation
 
