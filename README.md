@@ -2,7 +2,7 @@
 
 Official PyTorch implementation of **MEF-EFormer**, an efficient transformer architecture for multi-exposure image fusion.
 
-This repository includes the code and trained weights for the MEF-EFormer method.
+This repository includes the model implementation, inference script, and trained weights for MEF-EFormer.
 
 > **Paper:** The paper link will be added when available.
 
@@ -23,15 +23,51 @@ pip install -r requirements.txt
 
 ## Inference
 
-The inference script expects two well-aligned multi-exposure RGB images.
+The inference script expects two spatially aligned RGB images representing the underexposed and overexposed inputs. Both images must have identical spatial dimensions.
 
-Run the included example:
+### FP32 inference
+
+FP32 is the default inference mode:
+
+```bash
+python inference.py --under "images/under.png" --over "images/over.png" --output "output/fused.png" --precision fp32
+```
+
+The `--precision fp32` argument may be omitted:
 
 ```bash
 python inference.py --under "images/under.png" --over "images/over.png" --output "output/fused.png"
 ```
 
-The script automatically uses CUDA when available and otherwise runs on the CPU.
+### FP16 inference
+
+Native FP16 inference requires a CUDA-capable GPU:
+
+```bash
+python inference.py --under "images/under.png" --over "images/over.png" --output "output/fused_fp16.png" --precision fp16
+```
+
+In native FP16 mode, the model parameters, input tensors, and output tensor use `torch.float16`.
+
+### Custom checkpoint
+
+Use the `--weights` argument to load a custom checkpoint:
+
+```bash
+python inference.py --under "images/under.png" --over "images/over.png" --output "output/fused.png" --weights "checkpoints/MEF_EFormer.pth" --precision fp32
+```
+
+Display all available options:
+
+```bash
+python inference.py --help
+```
+
+The script automatically uses CUDA when available and otherwise runs on the CPU. Native FP16 inference is available only on CUDA.
+
+## Training
+
+The training code and instructions will be added in a future update.
 
 ## Citation
 
