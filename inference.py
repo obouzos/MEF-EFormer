@@ -144,7 +144,7 @@ def save_image(tensor: torch.Tensor, path: Path) -> None:
     output_image = TF.to_pil_image(image_tensor)
 
     with output_path.open("wb") as output_file:
-        output_image.save(output_file, format="PNG")
+        output_image.save(output_file, format="PNG", compress_level=6)
 
 
 def load_model(weights_path: Path, device: torch.device, dtype: torch.dtype) -> MEF_EFormer:
@@ -186,7 +186,7 @@ def main() -> None:
     over = over.to(device=device, dtype=dtype)
 
     with torch.inference_mode():
-        output = model(under, over).clamp_(0.0, 1.0)
+        output = model.inference(under, over)
 
     if not bool(torch.isfinite(output).all().item()):
         raise RuntimeError(f"Model produced non-finite values with {args.precision} inference.")
