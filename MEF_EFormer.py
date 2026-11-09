@@ -222,35 +222,35 @@ class GFFM(nn.Module):
         w1, w2 = self.ca(F1, F2)
         return self.ss(w1*F1, w2*F2)
 
-class MEF_EFormer(nn.Module):
-    def __init__(self):
+
+class MEF_EFormer_architecture(nn.Module):
+    def __init__(self,C=64):
         super().__init__()
-        self.channels   = [64,64,64,64]
+        self.num_layers =4
+        
+        self.channels   = [C]*self.num_layers
         self.expansion_factor   = 2.66
         self.num_refine_blocks = 2
-        self.num_layers =4
-
-        C = self.channels[-1]
-        N = self.num_layers
+        
 
         # ---- stems ----
-        self.stem_u = nn.Conv2d(3, 64, 3, 1, 1, bias=False)
-        self.stem_o = nn.Conv2d(3, 64, 3, 1, 1, bias=False)
+        self.stem_u = nn.Conv2d(3, C, 3, 1, 1, bias=False)
+        self.stem_o = nn.Conv2d(3, C, 3, 1, 1, bias=False)
 
         # ---- encoders ----
-        self.Ulayers = SSE_Restormer(num_blocks=[1,1,1,1],num_heads=[1,2,2,4],channels=[64,64,64,64],)
+        self.Ulayers = SSE_Restormer(num_blocks=[1,1,1,1],num_heads=[1,2,2,4],channels=self.channels,)
 
-        self.Olayers = SSE_Restormer(num_blocks=[1,1,1,1],num_heads=[1,2,2,4],channels=[64,64,64,64],)
+        self.Olayers = SSE_Restormer(num_blocks=[1,1,1,1],num_heads=[1,2,2,4],channels=self.channels,)
 
         # ---- Fused Layers ----
-        self.FuseLayers = nn.ModuleList([GFFM(channels=64) for i in range(self.num_layers)])
+        self.FuseLayers = nn.ModuleList([GFFM(channels=C) for i in range(self.num_layers)])
 
         # ---- CAFB ----
-        self.dec = CAFB(in_dim=N * C) 
-        self.dec_reduce = nn.Conv2d(N * C, C, kernel_size=1, bias=True)
+        self.dec = CAFB(in_dim=self.num_layers * C) 
+        self.dec_reduce = nn.Conv2d(self.num_layers * C, C, kernel_size=1, bias=True)
         
         self.refine_layer = nn.Sequential(*[
-            RestormerBlock(channels=64,num_heads=1,expansion_factor=2.66,)
+            RestormerBlock(channels=C,num_heads=1,expansion_factor=2.66,)
             for _ in range(self.num_refine_blocks)
         ])
         self.proj = nn.Conv2d(self.channels[-1], 3, kernel_size=1, stride=1, padding=0, bias=True)
@@ -286,3 +286,16 @@ class MEF_EFormer(nn.Module):
         out = self.forward(under, over)
         out = torch.clamp(out, 0.0, 1.0)
         return out
+
+
+class MEF_EFormer_tiny(MEF_EFormer_architecture):
+    def __init__(self):
+        super().__init__(C=16)
+
+class MEF_EFormer_small(MEF_EFormer_architecture):
+    def __init__(self):
+        super().__init__(C=32)
+
+class MEF_EFormer(MEF_EFormer_architecture):
+    def __init__(self):
+        super().__init__(C=64)
